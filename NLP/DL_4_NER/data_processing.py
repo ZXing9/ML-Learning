@@ -76,6 +76,8 @@ def data_review():
 
 # 数据处理
 
+# 实现单词、标签字典，并保存为pickle文件形式，便于后续直接调用。
+
 
 def data_processing():
     input_data = load_data()
