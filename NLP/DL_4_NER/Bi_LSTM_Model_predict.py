@@ -51,11 +51,11 @@ def input_data_for_model(input_shape):
 
 def create_Bi_LSTM(vocab_size, label_size, input_shape, output_dim, n_units, out_act, activation):
     model = Sequential()
-    model.add(Embedding(input_dim=vocab_size+1, output_dim=output_dim,
+    model.add(Embedding(input_dim=vocab_size + 1, output_dim=output_dim,
                         input_length=input_shape, mask_zero=True))
-    model.add(Bidirectional(
-        LSTM(units=n_units, activation=activation, return_sequences=True)))
-    model.add(TimeDistributed(Dense(label_size+1, activation=out_act)))
+    model.add(Bidirectional(LSTM(units=n_units, activation=activation,
+                                 return_sequences=True)))
+    model.add(TimeDistributed(Dense(label_size + 1, activation=out_act)))
     model.compile(optimizer='adam',
                   loss='categorical_crossentropy', metrics=['accuracy'])
     return model
@@ -69,7 +69,7 @@ def model_train():
     x, y, output_dictionary, vocab_size, label_size, inverse_word_dictionary = input_data_for_model(
         input_shape)
     train_end = int(len(x)*0.9)
-    train_x, train_y = x[:train_end], np.array(y[:train_end])
+    train_x, train_y = x[0:train_end], np.array(y[0:train_end])
     test_x, test_y = x[train_end:], np.array(y[train_end:])
 
     # 模型输入参数
@@ -92,12 +92,12 @@ def model_train():
     plot_model(lstm_model, to_file='%s/LSTM_model.png' % BASE_DIR)
 
     # 在测试集上的效果
-    N = test_x.shape[0]
-    avg_accuracy = 0
+    N = test_x.shape[0]  # 测试的条数
+    avg_accuracy = 0  # 预测的平均准确率
     for start, end in zip(range(0, N, 1), range(1, N+1, 1)):
         sentence = [inverse_word_dictionary[i]
                     for i in test_x[start] if i != 0]
-        y_predict = lstm_model.predict(test_y[start:end])
+        y_predict = lstm_model.predict(test_x[start:end])
         input_sequences, output_sequences = [], []
         for i in range(0, len(y_predict[0])):
             output_sequences.append(np.argmax(y_predict[0][i]))
